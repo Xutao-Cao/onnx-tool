@@ -331,6 +331,19 @@ class ExpNode(PWNode):
 
 
 @NODE_REGISTRY.register()
+class SoftplusNode(PWNode):
+    def __init__(self, node_proto):
+        super().__init__(node_proto)
+        self.op_mac = EXP_MACS + ADD_MACS + LOG_MACS
+        self.ratio = 1
+
+    def value_infer(self, intensors: List[Tensor], outtensors: List[Tensor]):
+        xexp = numpy.exp(intensors[0].get_numpy())
+        result = numpy.log(1 + xexp)
+        outtensors[0].update_tensor((result))
+
+
+@NODE_REGISTRY.register()
 class SoftmaxNode(ExpNode):
     def __init__(self, node_proto):
         super().__init__(node_proto)
